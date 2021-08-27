@@ -5,6 +5,7 @@
 """
 
 import cmd2
+import os
 
 
 class WebshellCmd(cmd2.Cmd):
@@ -17,3 +18,10 @@ class WebshellCmd(cmd2.Cmd):
 
     def __init__(self):
         super().__init__()
+
+    @staticmethod
+    def do_clear():
+        """
+        clear screen
+        """
+        os.system("cls || clear")
