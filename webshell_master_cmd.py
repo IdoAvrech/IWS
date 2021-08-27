@@ -7,37 +7,13 @@
 import cmd2
 
 
-class webshell_cmd(cmd2.Cmd):
+class WebshellCmd(cmd2.Cmd):
+    delattr(cmd2.Cmd, 'do_shell')  # disable shell builtin command (runs generic shell terminal)
+    delattr(cmd2.Cmd, 'do_ipy')  # disable ipy command (runs ipython)
+    delattr(cmd2.Cmd, 'do_macro')  # disable macro builtin command (creates macros)
+    delattr(cmd2.Cmd, 'do_py')  # disable py builtin command (runs python command)
+    delattr(cmd2.Cmd, 'do_edit')  # disable edit builtin command (opens in editor a text file)
+    delattr(cmd2.Cmd, 'do_alias')  # disable alias builtin command (create alias)
 
     def __init__(self):
         super().__init__()
-
-    def do_ipy(self, **kwargs):
-        """
-        disable ipy command (runs ipython)
-        """
-        raise NotImplementedError
-
-    def do_macro(self, **kwargs):
-        """
-        disable macro builtin command (creates macros)
-        """
-        raise NotImplementedError
-
-    def do_py(self, **kwargs):
-        """
-        disable py builtin command (runs python command)
-        """
-        raise NotImplementedError
-
-    def do_shell(self, **kwargs):
-        """
-        disable shell builtin command (runs generic shell terminal)
-        """
-        raise NotImplementedError
-
-    def do_edit(self, **kwargs):
-        """
-        disable edit builtin command (opens in editor a text file)
-        """
-        raise NotImplementedError
