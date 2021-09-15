@@ -5,26 +5,41 @@
 """
 
 import pathlib
-import re
+import consts
 
-PHP_HEADER = "<?php"
+PHP_HEADER = "<?php\n"
 PHP_FOOTER = "?>"
 
 
-def get_snippet(snippet_name: str):
-    snippet = pathlib.Path(snippet_name)
-    if not snippet.exists():
-        raise FileNotFoundError
-    return snippet.read_text()
-
-
-def insert_variables(snippet: str, variables: dict):
-    for variable, value in variables:
-        snippet = snippet.replace(variable, value)
+def get_snippet(snippet_name: str, variables: dict):
+    snippet_path = pathlib.Path(f"snippets/{snippet_name}")
+    snippet = snippet_path.read_text()
+    snippet = remove_php_headers(snippet)
+    snippet = insert_variables(snippet, variables)
+    snippet = add_separators(snippet)
     return snippet
 
 
+def insert_variables(snippet: str, variables: dict):
+    for variable, value in variables.items():
+        snippet = snippet.replace(variable, escape_characters(value))
+    return snippet
+
+
+def escape_characters(value):
+    if type(value) != str:
+        return value
+    escaped_characters = ["\\", "\""]
+    for character in escaped_characters:
+        value = value.replace(character, "\\" + character)
+    return value
+
+
 def remove_php_headers(snippet: str):
-    pattern = re.compile(PHP_HEADER + ".*" + PHP_FOOTER, re.DOTALL)
-    fixed_snippet = re.finditer(pattern, snippet)
-    return fixed_snippet
+    if snippet.startswith(PHP_HEADER) and snippet.endswith(PHP_FOOTER):
+        return snippet[len(PHP_HEADER):-1 * len(PHP_FOOTER)]
+    raise TypeError("Invalid snippet given!")
+
+
+def add_separators(snippet: str):
+    return consts.PHP_SEPARATOR + snippet + consts.PHP_SEPARATOR
