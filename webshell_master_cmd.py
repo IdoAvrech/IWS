@@ -11,10 +11,10 @@ import os
 class WebshellCmd(cmd2.Cmd):
     delattr(cmd2.Cmd, 'do_shell')  # disable shell builtin command (runs generic shell terminal)
     delattr(cmd2.Cmd, 'do_ipy')  # disable ipy command (runs ipython)
-    delattr(cmd2.Cmd, 'do_macro')  # disable macro builtin command (creates macros)
+    #delattr(cmd2.Cmd, 'do_macro')  # disable macro builtin command (creates macros)
     delattr(cmd2.Cmd, 'do_py')  # disable py builtin command (runs python command)
     delattr(cmd2.Cmd, 'do_edit')  # disable edit builtin command (opens in editor a text file)
-    delattr(cmd2.Cmd, 'do_alias')  # disable alias builtin command (create alias)
+    #delattr(cmd2.Cmd, 'do_alias')  # disable alias builtin command (create alias)
 
     def __init__(self):
         super().__init__()
@@ -26,15 +26,9 @@ class WebshellCmd(cmd2.Cmd):
         self.continuation_prompt = '... '
         # Color to output text in with echo command
         self.foreground_color = 'cyan'
-        # Make echo_fg settable at runtime
-        self.add_settable(cmd2.Settable('foreground_color',
-                                        str,
-                                        'Foreground color to use with echo command',
-                                        self,
-                                        choices=cmd2.Wfg.colors()))
 
     @staticmethod
-    def do_clear():
+    def do_clear(line):
         """
         clear screen
         """
