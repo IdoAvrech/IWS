@@ -6,6 +6,8 @@
 
 from webshell_master_cmd import WebshellCmd
 
+import shell_context.shell_terminal as shell
+
 
 class WebshellTerminal(WebshellCmd):
     """
@@ -16,4 +18,6 @@ class WebshellTerminal(WebshellCmd):
         super(WebshellTerminal, self).__init__()
         self.prompt = "webshell> "
 
-
+    def do_shell(self, *args):
+        shell_context = shell.ShellTerminal()
+        shell_context.cmdloop()
