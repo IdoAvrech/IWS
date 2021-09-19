@@ -1,0 +1,9 @@
+<?php
+    chdir("CURRENT_DIRECTORY");
+    $target_file = $_FILES["uploaded_file"]["name"];
+    if (move_uploaded_file($_FILES["uploaded_file"]["tmp_name"], $target_file)) {
+        echo "The file ". $_FILES["uploaded_file"]["name"] . " has been uploaded.";
+    } else {
+        echo "Sorry, there was an error uploading your file.";
+    }
+?>
