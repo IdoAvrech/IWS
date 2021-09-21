@@ -36,7 +36,7 @@ class ShellTerminal(WebshellCmd):
 
     def do_cd(self, statement: cmd2.Statement):
         """
-        Implement stateful
+        Implement stateful shell execution
         :param statement: Statement argument
         """
         snippet = get_snippet("directory_change.snippet",
