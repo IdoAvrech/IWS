@@ -1,0 +1,45 @@
+<?php
+    $test_file = tmpfile();
+    $meta_data = stream_get_meta_data($test_file);
+    $filename = $meta_data["uri"];
+    fclose($test_file);
+
+    chdir("CURRENT_DIRECTORY");
+    if(!is_dir("FOLDER_TO_DOWNLOAD"))
+    {
+        echo("ERROR_MESSAGE");
+    }
+    else
+    {
+        $rootPath = realpath("FOLDER_TO_DOWNLOAD");
+
+
+        $zip = new ZipArchive();
+        $zip->open($filename, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+
+        /** @var SplFileInfo[] $files */
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($rootPath),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $name => $file)
+        {
+            // Skip directories (they would be added automatically)
+            if (!$file->isDir())
+            {
+                // Get real and relative path for current file
+                $filePath = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($rootPath) + 1);
+                // echo($filePath . ' - ' . $relativePath . "\n");
+                // Add current file to archive
+                $zip->addFile($filePath, $relativePath);
+            }
+        }
+
+        // Zip archive will be created only after closing object
+        $zip->close();
+        echo(base64_encode(file_get_contents($filename)));
+    }
+?>
