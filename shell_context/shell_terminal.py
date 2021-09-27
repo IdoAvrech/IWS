@@ -23,7 +23,7 @@ class ShellTerminal(WebshellCmd):
         super(WebshellCmd, self).__init__()
         self.cwd = "."
         self.prompt = ".> "
-        self.do_cd(cmd2.Statement("."))
+        self.do_cd(cmd2.Statement(self.cwd))
         self.add_settable(cmd2.Settable("show_errors", bool, "Redirect errors to stdout", self,
                                         onchange_cb=self._onchange_show_errors))
         self.show_errors = True
