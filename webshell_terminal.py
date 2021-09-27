@@ -7,6 +7,7 @@
 from webshell_master_cmd import WebshellCmd
 
 import shell_context.shell_terminal as shell
+import db_context.database_terminal as database
 
 
 class WebshellTerminal(WebshellCmd):
@@ -18,6 +19,10 @@ class WebshellTerminal(WebshellCmd):
         super(WebshellTerminal, self).__init__()
         self.prompt = "webshell> "
 
-    def do_shell(self, *args):
+    def do_shell(self, statement):
         shell_context = shell.ShellTerminal()
         shell_context.cmdloop()
+
+    def do_database(self, statement):
+        database_context = database.DatabaseTerminal()
+        database_context.cmdloop()
